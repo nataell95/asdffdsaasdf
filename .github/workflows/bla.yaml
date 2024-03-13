@@ -1,17 +1,50 @@
-name: Super-Linter
-
-on: push
+name: LocalStack Test
+on: [ push, pull_request ]
 
 jobs:
-  super-lint:
-    name: Lint code base
+  localstack-action-test:
+    name: 'Test LocalStack GitHub Action'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Run Super-Linter
-        uses: github/super-linter@v4
+      - name: Start LocalStack
+        uses: ./
+        with:
+          image-tag: 'latest'
+          install-awslocal: 'true'
+          configuration: DEBUG=1
+          use-pro: 'true'
         env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+
+      - name: Run Tests against LocalStack
+        run: |
+          awslocal s3 mb s3://test
+          awslocal s3 ls
+          echo "Test Execution complete!"
+
+  cloud-pods-test:
+    name: 'Test Cloud Pods Action'
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⚡️ Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Start LocalStack
+        uses: ./
+        with:
+          image-tag: 'latest'
+          install-awslocal: 'true'
+          use-pro: 'false'
+
+      - name: Run AWS commands
+        run: |
+          awslocal s3 mb s3://test
+          awslocal sqs create-queue --queue-name test-queue
+
+      - name: Save the Cloud Pod 
+        uses: LocalStack/setup-localstack/cloud-pods@main
+        with:
+          name: cloud-pods-test
+          action: save
