@@ -9,15 +9,13 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: ./
+        uses: 'docker'
+        image: 'Dockerfile'
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
           configuration: DEBUG=1
-          use-pro: 'true'
-        env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-
+          use-pro: 'false'
       - name: Run Tests against LocalStack
         run: |
           awslocal s3 mb s3://test
@@ -27,12 +25,13 @@ jobs:
   cloud-pods-test:
     name: 'Test Cloud Pods Action'
     runs-on: ubuntu-latest
+    image: 'Dockerfile' 
     steps:
       - name: ⚡️ Checkout the repository
         uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: postgres
+        uses: 'docker'
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
