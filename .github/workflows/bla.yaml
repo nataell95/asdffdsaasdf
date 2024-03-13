@@ -9,8 +9,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: 'docker'
-        image: 'Dockerfile'
+        uses: ./
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
@@ -25,13 +24,12 @@ jobs:
   cloud-pods-test:
     name: 'Test Cloud Pods Action'
     runs-on: ubuntu-latest
-    image: 'Dockerfile' 
     steps:
       - name: ⚡️ Checkout the repository
         uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: 'docker'
+        uses: ./
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
