@@ -1,5 +1,5 @@
 name: LocalStack Test
-on: [ push ]
+on: [ push, pull_request ]
 
 jobs:
   localstack-action-test:
@@ -9,15 +9,13 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: localstack/localstack 
+        uses: LocalStack/setup-localstack@main
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
-          configuration: DEBUG=1
-          use-pro: 'false'
 
       - name: Run Tests against LocalStack
         run: |
           awslocal s3 mb s3://test
           awslocal s3 ls
-          echo "Test Execution complete!" 
+          echo "Test Execution complete!"
